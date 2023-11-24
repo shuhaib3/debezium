@@ -1,0 +1,19 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaConnector
+metadata:
+  name: mongo-connector-example2
+  labels:
+    strimzi.io/cluster: mongo-connect-cluster
+spec:
+  class: io.debezium.connector.mongodb.MongoDbConnector
+  tasksMax: 1
+  config:
+    mongodb.connection.string: "mongodb://admin:${secrets:kafka-connect/debezium-mongo-secret:password}@localhost:27017/?replicaSet=rs0"
+    mongodb.server.selection.timeout.ms: "60000"
+    collection.include.list: << dbname.collection >>
+    snapshot.mode: "never"
+    errors.max.retries: "3"
+    topic.prefix: << topic prefix >>
+    topic.creation.default.partitions: 1
+    topic.creation.default.replication.factor: 1
+    tombstones.on.delete: "false"
