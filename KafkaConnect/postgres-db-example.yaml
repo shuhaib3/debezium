@@ -1,0 +1,23 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaConnector
+metadata:
+  name: pg-connector-example
+  labels:
+    strimzi.io/cluster: pg-connect-cluster #This should match the Kafka Connector Name
+spec:
+  class: io.debezium.connector.postgresql.PostgresConnector
+  tasksMax: 1
+  config:
+    tasks.max: 1
+    database.hostname: << HOST ADDRESS >>
+    database.port: << PORT >>
+    database.user: << USERNAME >>
+    database.password: ${secrets:kafka-connect/debezium-secret:password}
+    database.dbname: << DB NAME >>
+    table.include.list: << schema.table_name >> # Seprated by comma
+    plugin.name: << plugin name >>
+    snapshot.mode: "never"
+    topic.prefix: << topic prefix >>
+    slot.name: << pg slot name >>
+    topic.creation.default.partitions: 1
+    topic.creation.default.replication.factor: 1
