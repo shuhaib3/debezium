@@ -1,0 +1,34 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaConnect
+metadata:
+  name: mongo-example
+  annotations:
+    strimzi.io/use-connector-resources: "true"
+spec:
+  version: 3.4.0
+  image: << image you built >>
+  replicas: 1
+  bootstrapServers: << kafka url >>
+  config:
+    config.providers: secrets
+    config.providers.secrets.class: io.strimzi.kafka.KubernetesSecretConfigProvider
+    group.id: mongo-example
+    offset.storage.topic: mongo-example-offsets
+    config.storage.topic: mongo-example-configs
+    status.storage.topic: mongo-example-status
+    # -1 means it will use the default replication factor configured in the broker
+    config.storage.replication.factor: -1
+    offset.storage.replication.factor: -1
+    status.storage.replication.factor: -1
+    key.converter.schemas.enable: true
+    value.converter.schemas.enable: true
+  jvmOptions:
+    "-Xmx": "1g" ##<< change this values accordingly >>
+    "-Xms": "1g" ##<< change this values accordingly >>
+# Use the below if you are getting any execption in debezium regarding host resolution to Machine where mongodb is hosted
+  template:
+    pod:
+      hostAliases:
+      - ip: "localhost"
+        hostnames:
+        - "mongodb-vm"
